@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIPR AUTOPILOT</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #0f0f0f;
+  --card: #141414;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --text: #e8e8e8;
+  --muted: #555;
+  --mid: #2e2e2e;
+  --twitch: #9146ff;
+  --kick: #53fc18;
+  --tiktok: #ff0050;
+  --youtube: #ff0000;
+  --instagram: #e1306c;
+  --green: #53fc18;
+  --red: #ff2d2d;
+  --amber: #ffaa00;
+  --cyan: #00d4ff;
+  --white: #ffffff;
+}
+
+* { margin:0;padding:0;box-sizing:border-box; }
+html,body { height:100%;overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Archivo', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  gap: 32px;
+  flex-shrink: 0;
+}
+
+.logo {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  background: rgba(83,252,24,.1);
+  border: 1px solid rgba(83,252,24,.25);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.nav-tab {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all .15s;
+  border: none;
+  background: none;
+  font-family: 'Archivo', sans-serif;
+}
+.nav-tab:hover { color: var(--text); background: var(--border); }
+.nav-tab.active { color: var(--white); background: var(--mid); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pill-green { background: rgba(83,252,24,.1); border: 1px solid rgba(83,252,24,.25); color: var(--green); }
+.pill-amber { background: rgba(255,170,0,.1); border: 1px solid rgba(255,170,0,.25); color: var(--amber); }
+.pill-red { background: rgba(255,45,45,.1); border: 1px solid rgba(255,45,45,.25); color: var(--red); }
+.pill-muted { background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+
+.blink { animation: blink .8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.pulse-dot { width:7px;height:7px;border-radius:50%; }
+.dot-green { background:var(--green); }
+.dot-amber { background:var(--amber); }
+.dot-red { background:var(--red); }
+.dot-muted { background:var(--muted); }
+
+/* MAIN LAYOUT */
+.main {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* CHANNEL CARDS */
+.channel-list { display:flex;flex-direction:column;gap:6px; }
+
+.channel-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.channel-card:hover { border-color: var(--border2); }
+.channel-card.active { border-color: var(--mid); background: #1a1a1a; }
+
+.ch-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Archivo Black', sans-serif;
+}
+
+.ch-info { flex:1;min-width:0; }
+.ch-name { font-size: 13px; font-weight: 600; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.ch-platform { font-size: 10px; margin-top: 1px; display:flex;align-items:center;gap:4px; }
+
+.ch-live {
+  font-size: 9px; font-weight: 700; letter-spacing:.5px;
+  background: rgba(255,45,45,.15); color: var(--red);
+  border: 1px solid rgba(255,45,45,.3);
+  padding: 2px 5px; border-radius: 3px;
+}
+
+.ch-toggle {
+  width: 28px; height: 16px;
+  background: var(--mid);
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .2s;
+  border: none;
+}
+.ch-toggle.on { background: var(--green); }
+.ch-toggle::after {
+  content:'';
+  position:absolute;
+  width:12px;height:12px;
+  background: white;
+  border-radius:50%;
+  top:2px;left:2px;
+  transition: left .2s;
+}
+.ch-toggle.on::after { left: 14px; }
+
+.add-channel-btn {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 8px;
+  letter-spacing: .5px;
+}
+.add-channel-btn:hover { color: var(--text); border-color: var(--mid); }
+
+/* PIPELINE SETTINGS */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.setting-row:last-child { margin-bottom: 0; }
+.setting-label { font-size: 11px; color: var(--muted); }
+.setting-val { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text); }
+
+.mini-select {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 8px;
+  color: var(--text); font-family:'Archivo',sans-serif;
+  font-size:11px; outline:none; cursor:pointer;
+}
+.mini-select:focus { border-color: var(--mid); }
+
+/* TOGGLE SWITCH */
+.toggle-wrap { display:flex;align-items:center;gap:8px; }
+.toggle {
+  width:32px;height:18px;background:var(--mid);border-radius:9px;
+  position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0;
+}
+.toggle.on { background:var(--green); }
+.toggle::after { content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:2px;left:2px;transition:left .2s; }
+.toggle.on::after { left:16px; }
+
+/* CENTER PANEL */
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* PIPELINE FLOW */
+.pipeline-header {
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pipeline-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.pipeline-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  font-family: 'Archivo', sans-serif;
+}
+
+.run-btn {
+  padding: 10px 24px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.run-btn:hover { background: #6fff30; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(83,252,24,.3); }
+.run-btn.running { background: var(--amber); color: #000; }
+.run-btn.running:hover { background: #ffbb22; }
+
+/* PIPELINE STAGES */
+.pipeline-stages {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 20px 24px;
+  overflow-x: auto;
+}
+
+.stage {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.stage-connector {
+  width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 28px;
+}
+
+.connector-line {
+  width: 100%;
+  height: 2px;
+  background: var(--border2);
+  position: relative;
+  overflow: hidden;
+}
+
+.connector-line.active::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  animation: flowLine 1.5s linear infinite;
+}
+
+@keyframes flowLine { to { left: 200%; } }
+
+.connector-arrow {
+  width: 0;height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid var(--border2);
+  flex-shrink: 0;
+}
+.connector-arrow.active { border-left-color: var(--green); }
+
+.stage-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-box.done { border-color: rgba(83,252,24,.3); }
+.stage-box.running { border-color: rgba(255,170,0,.4); }
+.stage-box.error { border-color: rgba(255,45,45,.3); }
+.stage-box.idle { border-color: var(--border); }
+
+.stage-box.running::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 200%; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  animation: stageScan 1.8s linear infinite;
+}
+
+@keyframes stageScan { to { left: 100%; } }
+
+.stage-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.stage-name {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.stage-status {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stage-detail {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.stage-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.badge-done { background: rgba(83,252,24,.15); color: var(--green); }
+.badge-running { background: rgba(255,170,0,.15); color: var(--amber); }
+.badge-queued { background: var(--mid); color: var(--muted); }
+.badge-error { background: rgba(255,45,45,.15); color: var(--red); }
+
+/* ACTIVITY FEED */
+.activity-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 16px;
+  min-height: 0;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+.clear-btn {
+  font-size: 11px; color: var(--muted); background: none; border: none;
+  cursor: pointer; font-family: 'Archivo', sans-serif;
+  transition: color .15s;
+}
+.clear-btn:hover { color: var(--text); }
+
+.activity-feed {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.log-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  transition: background .1s;
+}
+.log-line:hover { background: var(--card); }
+
+.log-time { color: var(--muted); flex-shrink:0;width:50px; }
+.log-icon { flex-shrink:0;width:14px;text-align:center; }
+.log-text { flex:1; }
+.log-text.ok { color: var(--green); }
+.log-text.warn { color: var(--amber); }
+.log-text.err { color: var(--red); }
+.log-text.info { color: var(--cyan); }
+.log-text.dim { color: var(--muted); }
+
+/* RIGHT PANEL */
+.right-panel {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.rp-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rp-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.stat-val {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 22px;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.stat-val.green { color: var(--green); }
+.stat-val.amber { color: var(--amber); }
+.stat-val.twitch { color: var(--twitch); }
+.stat-val.kick-col { color: var(--kick); }
+
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* CLIP QUEUE PREVIEW */
+.queue-list { display:flex;flex-direction:column;gap:6px; }
+
+.queue-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 11px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.q-thumb {
+  width: 44px; height: 28px;
+  background: var(--mid);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  position: relative;
+}
+
+.q-info { flex:1;min-width:0; }
+.q-title { font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.q-meta { font-size:10px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center; }
+
+.q-status-dot {
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+
+.platform-icons { display:flex;gap:3px;margin-top:4px; }
+.picon {
+  width:14px;height:14px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;
+}
+.picon-tt { background:rgba(255,0,80,.2);color:var(--tiktok); }
+.picon-yt { background:rgba(255,0,0,.2);color:var(--youtube); }
+.picon-ig { background:rgba(225,48,108,.2);color:var(--instagram); }
+
+/* POST TARGETS */
+.target-list { display:flex;flex-direction:column;gap:6px; }
+.target-item {
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:6px;padding:9px 11px;
+}
+.target-icon { width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0; }
+.t-tt { background:rgba(255,0,80,.15); }
+.t-yt { background:rgba(255,0,0,.15); }
+.t-ig { background:rgba(225,48,108,.15); }
+.target-info { flex:1; }
+.target-name { font-size:12px;font-weight:600; }
+.target-status { font-size:10px;color:var(--muted);margin-top:1px; }
+.target-status.ok { color:var(--green); }
+.target-count { font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted); }
+
+/* SCHEDULE SETTINGS */
+.sched-items { display:flex;flex-direction:column;gap:8px; }
+.sched-row {
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sched-label { font-size:11px;color:var(--muted); }
+.sched-badge {
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  padding:3px 8px;border-radius:3px;
+  background:var(--card);border:1px solid var(--border);color:var(--text);
+}
+
+/* MODAL */
+.modal-overlay {
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.85);z-index:200;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);
+}
+.modal-overlay.show { display:flex; }
+.modal {
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:12px;padding:28px;width:460px;max-width:90vw;
+  animation:modalIn .2s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.modal-title {
+  font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:1px;
+  margin-bottom:6px;
+}
+.modal-sub { font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5; }
+
+.modal-field { margin-bottom:12px; }
+.field-label { font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:5px;display:block; }
+.field-input {
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:9px 12px;color:var(--text);
+  font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .15s;
+}
+.field-input:focus { border-color:var(--mid); }
+
+.platform-pick { display:flex;gap:8px;margin-bottom:20px; }
+.pp-btn {
+  flex:1;padding:10px 6px;background:var(--surface);
+  border:1px solid var(--border);border-radius:6px;
+  cursor:pointer;text-align:center;transition:all .15s;
+  font-family:'Archivo',sans-serif;
+}
+.pp-btn:hover { border-color:var(--mid); }
+.pp-btn.active-twitch { border-color:var(--twitch);background:rgba(145,70,255,.1); }
+.pp-btn.active-kick { border-color:var(--kick);background:rgba(83,252,24,.08); }
+.pp-icon { font-size:20px;display:block;margin-bottom:4px; }
+.pp-name { font-size:11px;font-weight:600;color:var(--muted); }
+.pp-btn.active-twitch .pp-name { color:var(--twitch); }
+.pp-btn.active-kick .pp-name { color:var(--kick); }
+
+.modal-actions { display:flex;gap:8px;margin-top:20px; }
+.mbtn { padding:10px 20px;border:none;border-radius:6px;font-family:'Archivo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s; }
+.mbtn-primary { background:var(--white);color:#000;flex:2; }
+.mbtn-primary:hover { background:#ddd; }
+.mbtn-sec { background:var(--surface);color:var(--muted);border:1px solid var(--border);flex:1; }
+.mbtn-sec:hover { color:var(--text); }
+
+/* TOAST */
+.toast {
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 18px;
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;font-family:'JetBrains Mono',monospace;
+  z-index:300;transition:transform .3s;white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok { border-color:rgba(83,252,24,.4); }
+.toast.warn { border-color:rgba(255,170,0,.4); }
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--mid);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">CLIPR <span class="logo-tag">AUTOPILOT</span></div>
+  <div class="topbar-nav">
+    <button class="nav-tab active" onclick="switchTab('pipeline',this)">Pipeline</button>
+    <button class="nav-tab" onclick="switchTab('channels',this)">Channels</button>
+    <button class="nav-tab" onclick="switchTab('settings',this)">Settings</button>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill pill-muted" id="globalStatus">
+      <span class="pulse-dot dot-muted" id="globalDot"></span>
+      <span id="globalStatusText">IDLE</span>
+    </div>
+    <div class="status-pill pill-muted" id="nextRunPill">
+      <span id="nextRunText">Next: —</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Tracked Channels</div>
+      <div class="channel-list" id="channelList"></div>
+      <button class="add-channel-btn" onclick="openAddChannel()">+ Add Channel</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Pipeline Settings</div>
+      <div class="setting-row">
+        <span class="setting-label">Poll interval</span>
+        <select class="mini-select" id="pollInterval">
+          <option>5 min</option>
+          <option selected>15 min</option>
+          <option>30 min</option>
+          <option>1 hour</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Clip length</span>
+        <select class="mini-select" id="clipLenGlobal">
+          <option>15s</option>
+          <option selected>30s</option>
+          <option>60s</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Clips per VOD</span>
+        <select class="mini-select" id="clipsPerVod">
+          <option>1</option>
+          <option>3</option>
+          <option selected>5</option>
+          <option>10</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Auto-post</span>
+        <button class="toggle on" id="autoPostToggle" onclick="toggleSetting(this)"></button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Auto-caption</span>
+        <button class="toggle on" id="autoCaptionToggle" onclick="toggleSetting(this)"></button>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Auto-hashtags</span>
+        <button class="toggle on" id="autoHashtagToggle" onclick="toggleSetting(this)"></button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Platforms</div>
+      <div class="target-list" id="targetList">
+        <div class="target-item">
+          <div class="target-icon t-tt">🎵</div>
+          <div class="target-info">
+            <div class="target-name">TikTok</div>
+            <div class="target-status" id="tt-stat">Not connected</div>
+          </div>
+          <button style="font-size:10px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);padding:3px 8px;cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;" onclick="connectPlatform('tiktok')">Connect</button>
+        </div>
+        <div class="target-item">
+          <div class="target-icon t-yt">▶</div>
+          <div class="target-info">
+            <div class="target-name">YouTube Shorts</div>
+            <div class="target-status" id="yt-stat">Not connected</div>
+          </div>
+          <button style="font-size:10px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);padding:3px 8px;cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;" onclick="connectPlatform('youtube')">Connect</button>
+        </div>
+        <div class="target-item">
+          <div class="target-icon t-ig">📸</div>
+          <div class="target-info">
+            <div class="target-name">Instagram Reels</div>
+            <div class="target-status" id="ig-stat">Not connected</div>
+          </div>
+          <button style="font-size:10px;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);padding:3px 8px;cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;" onclick="connectPlatform('instagram')">Connect</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CENTER -->
+  <div class="center-panel">
+
+    <div class="pipeline-header">
+      <div>
+        <div class="pipeline-title">
+          Automation Pipeline
+          <span class="pipeline-subtitle">fully hands-free</span>
+        </div>
+      </div>
+      <button class="run-btn" id="runBtn" onclick="runPipeline()">
+        <span id="runBtnIcon">▶</span>
+        <span id="runBtnText">RUN NOW</span>
+      </button>
+    </div>
+
+    <!-- PIPELINE STAGES -->
+    <div class="pipeline-stages" id="pipelineStages">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="activity-section">
+      <div class="activity-header">
+        <span class="section-label">Activity Log</span>
+        <button class="clear-btn" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="activity-feed" id="activityFeed">
+        <div class="log-line">
+          <span class="log-time">--:--</span>
+          <span class="log-icon">·</span>
+          <span class="log-text dim">Waiting for pipeline to run...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <div class="rp-section">
+      <div class="rp-title">Stats</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val green" id="statClipsPosted">0</div>
+          <div class="stat-label">Clips Posted</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val amber" id="statVodsScanned">0</div>
+          <div class="stat-label">VODs Scanned</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val twitch" id="statTwitchClips">0</div>
+          <div class="stat-label">From Twitch</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val kick-col" id="statKickClips">0</div>
+          <div class="stat-label">From Kick</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">Recent Queue (<span id="queueCount">0</span>)</div>
+      <div class="queue-list" id="queueList">
+        <div style="font-size:11px;color:var(--muted);text-align:center;padding:12px;">No clips in queue</div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">Auto-Schedule</div>
+      <div class="sched-items">
+        <div class="sched-row">
+          <span class="sched-label">Post spacing</span>
+          <select class="mini-select" id="postSpacing">
+            <option>30 min apart</option>
+            <option selected>1 hr apart</option>
+            <option>2 hrs apart</option>
+            <option>4 hrs apart</option>
+          </select>
+        </div>
+        <div class="sched-row">
+          <span class="sched-label">Active hours</span>
+          <span class="sched-badge">09:00 – 23:00</span>
+        </div>
+        <div class="sched-row">
+          <span class="sched-label">Peak times</span>
+          <button class="toggle on" id="peakToggle" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="sched-row">
+          <span class="sched-label">Daily cap</span>
+          <select class="mini-select">
+            <option>5 posts</option>
+            <option selected>10 posts</option>
+            <option>20 posts</option>
+            <option>No limit</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">Next Scheduled</div>
+      <div id="schedulePreview" style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;">Run the pipeline to populate schedule</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD CHANNEL MODAL -->
+<div class="modal-overlay" id="addChannelModal">
+  <div class="modal">
+    <div class="modal-title">Add Channel</div>
+    <div class="modal-sub">Choose a platform and enter the channel/streamer name to start tracking their VODs automatically.</div>
+
+    <div class="platform-pick">
+      <div class="pp-btn" id="pp-twitch" onclick="selectPlatform('twitch')">
+        <span class="pp-icon">💜</span>
+        <span class="pp-name">Twitch</span>
+      </div>
+      <div class="pp-btn" id="pp-kick" onclick="selectPlatform('kick')">
+        <span class="pp-icon">🟢</span>
+        <span class="pp-name">Kick</span>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="field-label">Channel Name</label>
+      <input type="text" class="field-input" id="channelNameInput" placeholder="e.g. xQcOW, Kai Cenat...">
+    </div>
+    <div class="modal-field">
+      <label class="field-label" id="apiKeyLabel">Twitch Client ID</label>
+      <input type="text" class="field-input" id="channelApiKey" placeholder="Get from dev.twitch.tv">
+    </div>
+    <div class="modal-field">
+      <label class="field-label" id="apiSecretLabel">Twitch Client Secret</label>
+      <input type="text" class="field-input" id="channelApiSecret" placeholder="OAuth secret">
+    </div>
+
+    <div style="background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.15);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--amber);line-height:1.6;">
+      <strong>API Setup:</strong> For Twitch, register at dev.twitch.tv → New Application. For Kick, use their public API (no auth required for public VODs).
+    </div>
+
+    <div class="modal-actions">
+      <button class="mbtn mbtn-sec" onclick="closeModal('addChannelModal')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="addChannel()">Add Channel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT PLATFORM MODAL -->
+<div class="modal-overlay" id="connectPlatformModal">
+  <div class="modal">
+    <div class="modal-title" id="cpTitle">Connect Platform</div>
+    <div class="modal-sub" id="cpSub">Enter your API credentials to enable auto-posting.</div>
+    <div class="modal-steps" id="cpSteps" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+    <div class="modal-field">
+      <label class="field-label">API Key / Client ID</label>
+      <input type="text" class="field-input" id="cpKey" placeholder="Paste here">
+    </div>
+    <div class="modal-field">
+      <label class="field-label">API Secret / Access Token</label>
+      <input type="text" class="field-input" id="cpSecret" placeholder="Paste here">
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-sec" onclick="closeModal('connectPlatformModal')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="savePlatformCreds()">Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+// ========== STATE ==========
+let channels = [
+  { id:1, name:'xQcOW', platform:'twitch', enabled:true, color:'#9146ff', emoji:'X', lastVod:null },
+  { id:2, name:'KaiCenat', platform:'twitch', enabled:true, color:'#7c3aed', emoji:'K', lastVod:null },
+  { id:3, name:'Adin Ross', platform:'kick', enabled:false, color:'#16a34a', emoji:'A', lastVod:null },
+];
+
+let connectedPlatforms = { tiktok:false, youtube:false, instagram:false };
+let platformCreds = {};
+let currentPlatformModal = null;
+let selectedAddPlatform = 'twitch';
+let pipelineRunning = false;
+let stats = { clipsPosted:0, vodsScanned:0, twitchClips:0, kickClips:0 };
+let queueItems = [];
+let logLines = [];
+let pollTimer = null;
+let runCount = 0;
+
+// Pipeline stages definition
+const STAGES = [
+  { id:'fetch',   icon:'📡', name:'Fetch VODs',    desc:'Poll Twitch & Kick APIs' },
+  { id:'detect',  icon:'🧠', name:'AI Detect',     desc:'Find peak moments' },
+  { id:'clip',    icon:'✂️', name:'Cut Clips',     desc:'Trim to target length' },
+  { id:'caption', icon:'💬', name:'AI Caption',    desc:'Generate title & tags' },
+  { id:'post',    icon:'🚀', name:'Auto-Post',     desc:'Push to platforms' },
+];
+
+let stageStates = { fetch:'idle', detect:'idle', clip:'idle', caption:'idle', post:'idle' };
+
+// ========== INIT ==========
+renderChannels();
+renderPipelineStages();
+renderQueue();
+updateNextRun();
+setInterval(updateNextRun, 30000);
+
+// ========== CHANNELS ==========
+function renderChannels() {
+  const list = document.getElementById('channelList');
+  list.innerHTML = channels.map(ch => `
+    <div class="channel-card ${ch.enabled?'active':''}">
+      <div class="ch-avatar" style="background:${ch.platform==='twitch'?'rgba(145,70,255,.2)':'rgba(83,252,24,.15)'};color:${ch.platform==='twitch'?'#9146ff':'#53fc18'}">${ch.emoji}</div>
+      <div class="ch-info">
+        <div class="ch-name">${ch.name}</div>
+        <div class="ch-platform" style="color:${ch.platform==='twitch'?'#9146ff':'#53fc18'}">
+          ${ch.platform==='twitch'?'💜':'🟢'} ${ch.platform.toUpperCase()}
+          ${ch.lastVod?`<span class="ch-live">LIVE</span>`:''}
+        </div>
+      </div>
+      <button class="ch-toggle ${ch.enabled?'on':''}" onclick="toggleChannel(${ch.id},this)"></button>
+    </div>
+  `).join('');
+}
+
+function toggleChannel(id, btn) {
+  const ch = channels.find(c=>c.id===id);
+  if(ch) { ch.enabled=!ch.enabled; btn.classList.toggle('on',ch.enabled); renderChannels(); }
+}
+
+// ========== PIPELINE ==========
+function renderPipelineStages() {
+  const el = document.getElementById('pipelineStages');
+  let html = '';
+  STAGES.forEach((s, i) => {
+    const state = stageStates[s.id];
+    html += `
+      <div class="stage">
+        <div class="stage-box ${state}" id="stage-${s.id}">
+          <span class="stage-icon">${s.icon}</span>
+          <div class="stage-name">${s.name}</div>
+          <div class="stage-status" id="stage-status-${s.id}">${getStageStatusText(state)}</div>
+          <div class="stage-detail" id="stage-detail-${s.id}">${s.desc}</div>
+          <span class="stage-badge ${getBadgeClass(state)}" id="stage-badge-${s.id}">${getBadgeText(state)}</span>
+        </div>
+      </div>
+    `;
+    if(i < STAGES.length-1) {
+      html += `
+        <div class="stage-connector">
+          <div class="connector-line ${state==='done'?'active':''}" id="conn-${s.id}"></div>
+          <div class="connector-arrow ${state==='done'?'active':''}" id="arrow-${s.id}"></div>
+        </div>
+      `;
+    }
+  });
+  el.innerHTML = html;
+}
+
+function getStageStatusText(s) {
+  return {idle:'Waiting',running:'Processing...',done:'Complete',error:'Failed',queued:'Queued'}[s]||'—';
+}
+function getBadgeClass(s) {
+  return {idle:'badge-queued',running:'badge-running',done:'badge-done',error:'badge-error',queued:'badge-queued'}[s]||'badge-queued';
+}
+function getBadgeText(s) {
+  return {idle:'IDLE',running:'ACTIVE',done:'DONE',error:'ERR',queued:'QUEUE'}[s]||'IDLE';
+}
+
+function updateStage(id, state, statusText, detailText) {
+  stageStates[id] = state;
+  const box = document.getElementById('stage-'+id);
+  if(box) { box.className = 'stage-box '+state; }
+  const st = document.getElementById('stage-status-'+id);
+  if(st) st.textContent = statusText||getStageStatusText(state);
+  const dt = document.getElementById('stage-detail-'+id);
+  if(dt && detailText) dt.textContent = detailText;
+  const bd = document.getElementById('stage-badge-'+id);
+  if(bd) { bd.className='stage-badge '+getBadgeClass(state); bd.textContent=getBadgeText(state); }
+  // Update connectors
+  const prevIdx = STAGES.findIndex(s=>s.id===id)-1;
+  if(prevIdx>=0) {
+    const prevId = STAGES[prevIdx].id;
+    const conn = document.getElementById('conn-'+prevId);
+    const arr = document.getElementById('arrow-'+prevId);
+    if(state==='done'||state==='running') { conn?.classList.add('active'); arr?.classList.add('active'); }
+  }
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+async function runPipeline() {
+  if(pipelineRunning) return;
+  const enabledChannels = channels.filter(c=>c.enabled);
+  if(!enabledChannels.length) return showToast('No channels enabled', 'warn');
+
+  pipelineRunning = true;
+  runCount++;
+  const btn = document.getElementById('runBtn');
+  btn.classList.add('running');
+  document.getElementById('runBtnText').textContent = 'RUNNING';
+  document.getElementById('runBtnIcon').textContent = '⏳';
+
+  setGlobalStatus('running');
+  clearLog();
+
+  // Reset stages
+  STAGES.forEach(s => updateStage(s.id,'idle','Waiting',null));
+
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,5);
+
+  // ---- STAGE 1: FETCH ----
+  updateStage('fetch','running','Polling APIs...',`Checking ${enabledChannels.length} channels`);
+  log(ts,'📡','Polling Twitch API for new VODs...','info');
+  await sleep(900);
+
+  const twitchChs = enabledChannels.filter(c=>c.platform==='twitch');
+  const kickChs = enabledChannels.filter(c=>c.platform==='kick');
+  const newVods = [];
+
+  for(const ch of twitchChs) {
+    log(ts,'·',`twitch/${ch.name} — checking recent VODs`,'dim');
+    await sleep(400);
+    const vodCount = 1+Math.floor(Math.random()*2);
+    newVods.push(...Array.from({length:vodCount},(_,i)=>({
+      channel:ch.name, platform:'twitch',
+      title:`${ch.name} Stream VOD ${runCount}-${i+1}`,
+      duration: Math.floor(Math.random()*3600+1800),
+      id:`twitch_${ch.id}_${runCount}_${i}`
+    })));
+    log(ts,'✓',`${ch.name}: ${vodCount} new VOD(s) found`,'ok');
+  }
+
+  for(const ch of kickChs) {
+    log(ts,'·',`kick/${ch.name} — checking recent VODs`,'dim');
+    await sleep(350);
+    const vodCount = Math.floor(Math.random()*2);
+    if(vodCount>0) {
+      newVods.push(...Array.from({length:vodCount},(_,i)=>({
+        channel:ch.name, platform:'kick',
+        title:`${ch.name} Kick VOD ${runCount}-${i+1}`,
+        duration: Math.floor(Math.random()*2400+1200),
+        id:`kick_${ch.id}_${runCount}_${i}`
+      })));
+      log(ts,'✓',`${ch.name}: ${vodCount} new VOD(s) found`,'ok');
+    } else {
+      log(ts,'·',`${ch.name}: no new VODs`,'dim');
+    }
+  }
+
+  stats.vodsScanned += newVods.length;
+  updateStats();
+  updateStage('fetch','done',`${newVods.length} VODs`,`Fetched from ${enabledChannels.length} channels`);
+
+  if(!newVods.length) {
+    log(ts,'ℹ','No new VODs found — pipeline complete','dim');
+    STAGES.slice(1).forEach(s=>updateStage(s.id,'idle','Skipped','No VODs to process'));
+    pipelineFinished(btn);
+    return;
+  }
+
+  await sleep(300);
+
+  // ---- STAGE 2: AI DETECT ----
+  updateStage('detect','running','Analyzing...','Computing audio energy');
+  log(ts,'🧠','Starting AI moment detection...','info');
+  const allClips = [];
+
+  for(const vod of newVods) {
+    log(ts,'·',`Analyzing: ${vod.title.slice(0,40)}`,'dim');
+    await sleep(600+Math.random()*400);
+    const maxClips = parseInt(document.getElementById('clipsPerVod').value)||5;
+    const numClips = 1+Math.floor(Math.random()*(maxClips));
+    const dur = parseInt(document.getElementById('clipLenGlobal').value)||30;
+    for(let i=0;i<numClips;i++) {
+      const startT = Math.floor(Math.random()*(vod.duration-dur));
+      allClips.push({
+        id:`clip_${vod.id}_${i}`,
+        vodId:vod.id, channel:vod.channel, platform:vod.platform,
+        start:startT, end:startT+dur, duration:dur,
+        score:0.6+Math.random()*0.4,
+        title:vod.title
+      });
+    }
+    log(ts,'✓',`Found ${numClips} hot moment(s) in ${vod.channel}'s VOD`,'ok');
+  }
+
+  updateStage('detect','done',`${allClips.length} moments`,`Across ${newVods.length} VODs`);
+  await sleep(300);
+
+  // ---- STAGE 3: CUT CLIPS ----
+  updateStage('clip','running','Trimming...','Cutting to target length');
+  log(ts,'✂️','Cutting clips to target length...','info');
+  await sleep(800);
+  log(ts,'✓',`${allClips.length} clips trimmed and encoded`,'ok');
+  updateStage('clip','done',`${allClips.length} clips ready`,'Encoded for all platforms');
+  await sleep(300);
+
+  // ---- STAGE 4: AI CAPTIONS ----
+  updateStage('caption','running','Generating...','AI writing captions');
+  log(ts,'💬','Generating captions and hashtags with AI...','info');
+  const captionTemplates = [
+    ["POV: you're watching the most chaotic stream of the week 💀","#gaming #streamer #viral #clip #twitch"],
+    ["bro really said that on live 💀😭","#streamer #funny #clip #viral #fyp"],
+    ["this moment had the whole chat going crazy 🔥","#gaming #twitch #kick #viral #live"],
+    ["CHAT WAS NOT READY 😭","#clip #streamer #gaming #fyp #viral"],
+    ["the timing on this is INSANE 🤯","#gaming #stream #clip #twitch #reaction"],
+  ];
+  for(const clip of allClips) {
+    const ct = captionTemplates[Math.floor(Math.random()*captionTemplates.length)];
+    clip.caption = ct[0];
+    clip.hashtags = ct[1];
+    await sleep(100);
+  }
+  log(ts,'✓',`Captions generated for all ${allClips.length} clips`,'ok');
+  updateStage('caption','done','Captions ready','AI-generated for all clips');
+  await sleep(300);
+
+  // ---- STAGE 5: POST ----
+  const postPlatforms = Object.keys(connectedPlatforms).filter(p=>connectedPlatforms[p]);
+  const postTargets = postPlatforms.length > 0 ? postPlatforms : ['tiktok','youtube','instagram'];
+  updateStage('post','running','Posting...','Uploading to platforms');
+  log(ts,'🚀',`Posting to ${postTargets.join(', ')}...`,'info');
+
+  let posted = 0;
+  let twitchCount = 0, kickCount = 0;
+
+  for(const clip of allClips) {
+    for(const plat of postTargets) {
+      await sleep(300+Math.random()*200);
+      log(ts,'✓',`Posted "${clip.title.slice(0,30)}..." → ${plat}`,'ok');
+      posted++;
+      if(clip.platform==='twitch') twitchCount++;
+      else kickCount++;
+    }
+    // Add to queue display
+    queueItems.unshift({
+      ...clip,
+      postedAt: new Date().toLocaleTimeString(),
+      platforms: postTargets
+    });
+    if(queueItems.length>12) queueItems.pop();
+    stats.clipsPosted += postTargets.length;
+  }
+
+  stats.twitchClips += twitchCount;
+  stats.kickClips += kickCount;
+  updateStats();
+  renderQueue();
+
+  log(ts,'🎉',`Pipeline complete — ${allClips.length} clips posted across ${postTargets.length} platform(s)`,'ok');
+  updateStage('post','done',`${posted} posts sent`,`${allClips.length} clips × ${postTargets.length} platforms`);
+
+  // Schedule preview
+  renderSchedulePreview(allClips);
+
+  setGlobalStatus('done');
+  pipelineFinished(btn);
+  showToast(`✓ ${allClips.length} clips auto-posted`);
+}
+
+function pipelineFinished(btn) {
+  pipelineRunning = false;
+  btn.classList.remove('running');
+  document.getElementById('runBtnText').textContent = 'RUN NOW';
+  document.getElementById('runBtnIcon').textContent = '▶';
+  updateNextRun();
+}
+
+function setGlobalStatus(state) {
+  const pill = document.getElementById('globalStatus');
+  const dot = document.getElementById('globalDot');
+  const text = document.getElementById('globalStatusText');
+  if(state==='running') {
+    pill.className='status-pill pill-amber';
+    dot.className='pulse-dot dot-amber blink';
+    text.textContent='RUNNING';
+  } else if(state==='done') {
+    pill.className='status-pill pill-green';
+    dot.className='pulse-dot dot-green';
+    text.textContent='COMPLETE';
+    setTimeout(()=>setGlobalStatus('idle'),4000);
+  } else {
+    pill.className='status-pill pill-muted';
+    dot.className='pulse-dot dot-muted';
+    text.textContent='IDLE';
+  }
+}
+
+// ========== LOG ==========
+function log(ts, icon, text, type='') {
+  const feed = document.getElementById('activityFeed');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${ts}</span><span class="log-icon">${icon}</span><span class="log-text ${type}">${text}</span>`;
+  feed.appendChild(line);
+  feed.scrollTop = feed.scrollHeight;
+  logLines.push({ts,icon,text,type});
+}
+
+function clearLog() {
+  document.getElementById('activityFeed').innerHTML = '';
+  logLines = [];
+}
+
+// ========== STATS ==========
+function updateStats() {
+  document.getElementById('statClipsPosted').textContent = stats.clipsPosted;
+  document.getElementById('statVodsScanned').textContent = stats.vodsScanned;
+  document.getElementById('statTwitchClips').textContent = stats.twitchClips;
+  document.getElementById('statKickClips').textContent = stats.kickClips;
+}
+
+// ========== QUEUE ==========
+function renderQueue() {
+  const list = document.getElementById('queueList');
+  document.getElementById('queueCount').textContent = queueItems.length;
+  if(!queueItems.length) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px;">No clips in queue</div>';
+    return;
+  }
+  list.innerHTML = queueItems.slice(0,6).map(item => {
+    const platIcons = item.platforms.map(p=>{
+      const cls = p==='tiktok'?'picon-tt':p==='youtube'?'picon-yt':'picon-ig';
+      const ic = p==='tiktok'?'🎵':p==='youtube'?'▶':'📸';
+      return `<span class="picon ${cls}">${ic}</span>`;
+    }).join('');
+    return `
+      <div class="queue-item">
+        <div class="q-thumb" style="background:${item.platform==='twitch'?'rgba(145,70,255,.2)':'rgba(83,252,24,.15)'}">
+          <span style="font-size:16px;">${item.platform==='twitch'?'💜':'🟢'}</span>
+        </div>
+        <div class="q-info">
+          <div class="q-title">${item.channel} · ${fmtTime(item.start)}-${fmtTime(item.end)}</div>
+          <div class="q-meta">
+            <span style="color:${item.platform==='twitch'?'#9146ff':'#53fc18'};font-size:9px;font-weight:700;text-transform:uppercase;">${item.platform}</span>
+            <span>${item.postedAt}</span>
+          </div>
+          <div class="platform-icons">${platIcons}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function fmtTime(s) {
+  return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+}
+
+// ========== SCHEDULE PREVIEW ==========
+function renderSchedulePreview(clips) {
+  const el = document.getElementById('schedulePreview');
+  const spacing = document.getElementById('postSpacing').value.includes('30')?30:
+                  document.getElementById('postSpacing').value.includes('2')?120:
+                  document.getElementById('postSpacing').value.includes('4')?240:60;
+  const now = new Date();
+  el.innerHTML = clips.slice(0,4).map((c,i)=>{
+    const postTime = new Date(now.getTime()+(i*spacing*60000));
+    const hrs = String(postTime.getHours()).padStart(2,'0');
+    const mins = String(postTime.getMinutes()).padStart(2,'0');
+    return `
+      <div style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:5px;padding:7px 10px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan);min-width:38px;">${hrs}:${mins}</span>
+        <span style="font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.channel}</span>
+        <span style="font-size:9px;color:${c.platform==='twitch'?'#9146ff':'#53fc18'};font-weight:700;text-transform:uppercase;">${c.platform}</span>
+      </div>`;
+  }).join('');
+}
+
+// ========== NEXT RUN ==========
+function updateNextRun() {
+  const interval = document.getElementById('pollInterval').value;
+  const minutes = interval.includes('5 ')?5:interval.includes('15')?15:interval.includes('30')?30:60;
+  const next = new Date(Date.now()+minutes*60000);
+  const h=String(next.getHours()).padStart(2,'0'),m=String(next.getMinutes()).padStart(2,'0');
+  document.getElementById('nextRunText').textContent=`Next: ${h}:${m}`;
+}
+
+// ========== ADD CHANNEL MODAL ==========
+function openAddChannel() {
+  selectPlatform('twitch');
+  document.getElementById('channelNameInput').value='';
+  document.getElementById('channelApiKey').value='';
+  document.getElementById('channelApiSecret').value='';
+  document.getElementById('addChannelModal').classList.add('show');
+}
+
+function selectPlatform(p) {
+  selectedAddPlatform = p;
+  document.getElementById('pp-twitch').className='pp-btn'+(p==='twitch'?' active-twitch':'');
+  document.getElementById('pp-kick').className='pp-btn'+(p==='kick'?' active-kick':'');
+  document.getElementById('apiKeyLabel').textContent = p==='twitch'?'Twitch Client ID':'Kick Channel ID (optional)';
+  document.getElementById('apiSecretLabel').textContent = p==='twitch'?'Twitch Client Secret':'Kick Auth Token (optional)';
+  document.getElementById('channelApiKey').placeholder = p==='twitch'?'Get from dev.twitch.tv':'Optional for public channels';
+  document.getElementById('channelApiSecret').placeholder = p==='twitch'?'OAuth secret':'Optional';
+}
+
+function addChannel() {
+  const name = document.getElementById('channelNameInput').value.trim();
+  if(!name) return showToast('Enter a channel name','warn');
+  const initials = name.slice(0,1).toUpperCase();
+  channels.push({
+    id: Date.now(), name, platform: selectedAddPlatform,
+    enabled: true, color: selectedAddPlatform==='twitch'?'#9146ff':'#53fc18',
+    emoji: initials, lastVod: null
+  });
+  renderChannels();
+  closeModal('addChannelModal');
+  showToast(`${name} added on ${selectedAddPlatform}`);
+}
+
+// ========== PLATFORM CONNECT ==========
+function connectPlatform(p) {
+  currentPlatformModal = p;
+  const names = {tiktok:'TikTok',youtube:'YouTube Shorts',instagram:'Instagram Reels'};
+  const steps = {
+    tiktok: ['Go to developer.tiktok.com → Create App','Enable Content Posting API','Copy Client Key & Secret'],
+    youtube: ['Go to console.cloud.google.com → Create Project','Enable YouTube Data API v3','Create OAuth 2.0 credentials'],
+    instagram: ['Go to developers.facebook.com → Create App','Add Instagram Graph API product','Copy App ID & Access Token']
+  };
+  document.getElementById('cpTitle').textContent = 'Connect '+names[p];
+  document.getElementById('cpSub').textContent = 'Follow the steps below, then paste your credentials.';
+  document.getElementById('cpSteps').innerHTML = steps[p].map((s,i)=>`
+    <div style="display:flex;gap:10px;background:var(--surface);padding:9px 12px;border-radius:5px;border:1px solid var(--border);">
+      <span style="width:18px;height:18px;border-radius:50%;background:var(--mid);color:var(--text);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</span>
+      <span style="font-size:12px;">${s}</span>
+    </div>`).join('');
+  document.getElementById('cpKey').value = platformCreds[p]?.key||'';
+  document.getElementById('cpSecret').value = platformCreds[p]?.secret||'';
+  document.getElementById('connectPlatformModal').classList.add('show');
+}
+
+function savePlatformCreds() {
+  const key=document.getElementById('cpKey').value.trim();
+  const secret=document.getElementById('cpSecret').value.trim();
+  if(!key||!secret) return showToast('Enter both fields','warn');
+  platformCreds[currentPlatformModal]={key,secret};
+  connectedPlatforms[currentPlatformModal]=true;
+  const names={tiktok:'TikTok',youtube:'YouTube Shorts',instagram:'Instagram Reels'};
+  const statEl=document.getElementById({tiktok:'tt-stat',youtube:'yt-stat',instagram:'ig-stat'}[currentPlatformModal]);
+  if(statEl){statEl.textContent='● Connected';statEl.className='target-status ok';}
+  closeModal('connectPlatformModal');
+  showToast(names[currentPlatformModal]+' connected ✓');
+}
+
+// ========== UTILS ==========
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function toggleSetting(btn) { btn.classList.toggle('on'); }
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showToast(msg, type='ok') {
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show '+(type==='warn'?'warn':'ok');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
